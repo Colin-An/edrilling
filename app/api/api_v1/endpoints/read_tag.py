@@ -1,6 +1,7 @@
 import logging
 from os import name
 from typing import Any
+import asyncio
 
 import schemas
 from api import deps
@@ -31,9 +32,9 @@ def read_tag_value_api(tag_name: str
     read value of some parameter by name
     """
     logger.info('read_tag request')
-    print('here')
-    answer = readtag(Tag(
-        name = tag_name,
-        value = 0.0
-    ))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    answer = loop.run_until_complete(readtag(Tag(
+        name = tag_name
+    )))
     return answer

@@ -1,10 +1,7 @@
 from schemas import Tag, WebSocketAnswer
 
 async def readtag(tag: Tag) -> WebSocketAnswer:
-    tag.value = 0.999
-    print(tag)
     answer = WebSocketAnswer(
-        response = 'blablabla'
+        response = tag.name + ' bla'
     ) 
-    print(answer)
     return answer
