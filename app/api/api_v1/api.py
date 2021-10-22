@@ -1,4 +1,4 @@
-from api.api_v1.endpoints import read_tag, service
+from app.api.api_v1.endpoints import read_tag, service
 from fastapi import APIRouter
 
 api_router = APIRouter()

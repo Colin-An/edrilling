@@ -1,8 +1,8 @@
 import logging
 
 from fastapi import FastAPI
-from core.config import settings
-from api.api_v1.api import api_router
+from app.core.config import settings
+from app.api.api_v1.api import api_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,6 +12,6 @@ app = FastAPI(
 )
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-from schemas import WebSocketAnswer
+from app.schemas import WebSocketAnswer
 a = WebSocketAnswer(response='a')
 print(a)
