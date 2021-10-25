@@ -4,12 +4,11 @@ from typing import Any, List
 import asyncio
 
 from fastapi.param_functions import Query
+from app.core.config import settings
 
-from app.schemas import WebSocketAnswer, Tag
-from app.api import deps
+from app.schemas import Tag, Token, ReadResponse
 from fastapi import APIRouter, Query, HTTPException, Header
-from fastapi.security.api_key import APIKey
-from fastapi.responses import Response
+
 
 from app.tasks.read_tag_task import readtag
 
@@ -22,21 +21,32 @@ router = APIRouter()
 
 @router.get(
     "/readTag",
-    response_model=WebSocketAnswer,
+    response_model=ReadResponse,
     status_code=200,
 )
-async def read_tag_value_api(name: str = Query('', max_lenght=100),
-    access_token: str = Header('', max_lenght=500)
+async def read_tag_value_api(name: str = Query('', max_lenght=settings.STR_MAX_LEN),
+    access_token: str = Header('', max_lenght=settings.TOKEN_MAX_LEN)
 ) -> Any:
     """
     read value of some parameter by name
     """
-    if not (access_token and name):
-        raise HTTPException(
-            status_code=400,
-            detail="Bad parameter name or access_token",
-        )
-    logger.info(access_token)
+    logger.info(f'access_token {access_token}')
     logger.info(f'read_tag {name}')
-    results = await readtag(Tag(name=name), access_token)
-    return results
+
+    try:
+        tag = Tag(name=name)
+        token = Token(value=access_token)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
+    ws_results = await readtag(tag, token)
+
+    if "read_error" in ws_results.response or ws_results.status_code != 200:
+        raise HTTPException(
+            status_code=404,
+            detail=ws_results.response,
+        )
+    return ReadResponse(response=ws_results.response)
+    

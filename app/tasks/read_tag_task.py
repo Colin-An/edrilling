@@ -1,12 +1,22 @@
-from app.schemas import Tag, WebSocketAnswer
+import logging
+
+from app.schemas import Tag, WebSocketAnswer, Token
 from app.web_socets.ws_functions import produce
 from app.core.config import settings
 
-host = settings.WS_HOST
 
-async def readtag(tag: Tag, access_token: str) -> WebSocketAnswer:
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+host = settings.WS_HOST
+port = settings.WS_PORT
+path = settings.WS_PATH
+
+async def readtag(tag: Tag, access_token: Token) -> WebSocketAnswer:
     message = f'read|{tag.name}'
-    response_text = await produce(message, f"{host}{access_token}")
-    return WebSocketAnswer(
-        response=response_text
-    )
+    url = f'{host}:{port}/{path}'
+    logger.info(f'sending message {message} to {url}')
+    response = await produce(
+        message, 
+        f"{url}?access_token={access_token.value}")
+    return response

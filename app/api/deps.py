@@ -1,3 +1,7 @@
+# Please use this file if you want to have sepparate access to this enpoint
+# with sepparate access token which will be difuned in environment as SECRET_KEY
+# and don't forget to add dependences to your endpoints
+
 from typing import Any
 
 from app.core.config import settings
