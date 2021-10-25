@@ -7,7 +7,7 @@ from fastapi.param_functions import Query
 
 from app.schemas import WebSocketAnswer, Tag
 from app.api import deps
-from fastapi import APIRouter, Query, HTTPException, Header
+from fastapi import APIRouter, Query, HTTPException, Header, Request
 from fastapi.security.api_key import APIKey
 from fastapi.responses import Response
 
@@ -20,16 +20,16 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get(
-    "/readTag",
+@router.post(
+    "/writeTag",
     response_model=WebSocketAnswer,
     status_code=200,
 )
-async def read_tag_value_api(name: str = Query('', max_lenght=100),
+async def write_tag_value_api(data: Tag,
     access_token: str = Header('', max_lenght=500)
 ) -> Any:
     """
-    read value of some parameter by name
+    write value of some parameter by name
     """
     if not (access_token and name):
         raise HTTPException(
@@ -37,6 +37,6 @@ async def read_tag_value_api(name: str = Query('', max_lenght=100),
             detail="Bad parameter name or access_token",
         )
     logger.info(access_token)
-    logger.info(f'read_tag {name}')
-    results = await readtag(Tag(name=name), access_token)
+    logger.info('read_tag request')
+    results = await readtag(Tag(name=name))
     return results
