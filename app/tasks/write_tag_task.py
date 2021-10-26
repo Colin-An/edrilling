@@ -13,10 +13,15 @@ host = settings.WS_HOST
 port = settings.WS_PORT
 path = settings.WS_PATH
 
-async def writetag(tag: Tag, access_token: Token) -> WebSocketAnswer:
-    message = f'write|{tag.name}|{round(time()*1000.0)}|6|{tag.value}'
+async def write_tag(tag: Tag, access_token: Token) -> WebSocketAnswer:
+    timestamp_ms = round(time()*1000.0)
+    # create message with right format
+    message = f'write|{tag.name}|{timestamp_ms}|6|{tag.value}'
+    # create ULR to web socket server
     url = f'{host}:{port}/{path}'
     logger.info(f'sending message {message} to {url}')
+    # send message to server with access_token, with parameter that code 
+    # must not await for answer
     response = await produce(
                     message,
                     f"{url}?access_token={access_token.value}", 

@@ -11,4 +11,4 @@ services:
             - .env_dev
         ports:
             - "${ENDPOINT_PORT}:${ENDPOINT_PORT}"
-        command: gunicorn -b 0.0.0.0:${ENDPOINT_PORT} -k uvicorn.workers.UvicornWorker app.main:app --workers=2
+        command: gunicorn -b ${ENDPOINT_HOST}:${ENDPOINT_PORT} -k uvicorn.workers.UvicornWorker app.main:app --workers=2

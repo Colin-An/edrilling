@@ -1,17 +1,11 @@
 import logging
-from os import name
-from typing import Any, List
-import asyncio
+from typing import Any
 
-from fastapi.param_functions import Query
-
-from app.schemas import WebSocketAnswer, Tag, Token
 from app.core.config import settings
-from fastapi import APIRouter, Query, HTTPException, Header, Request
-from fastapi.security.api_key import APIKey
-from fastapi.responses import Response
+from app.tasks.write_tag_task import write_tag
+from app.schemas import Tag, Token
 
-from app.tasks.write_tag_task import writetag
+from fastapi import APIRouter, HTTPException, Header
 
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +16,7 @@ router = APIRouter()
 
 @router.post(
     "/writeTag",
-    response_model=WebSocketAnswer,
+    response_model=None,
     status_code=200,
 )
 async def write_tag_value_api(tag: Tag,
@@ -31,25 +25,31 @@ async def write_tag_value_api(tag: Tag,
     """
     write value of some parameter by name
     """
-
     logger.info(access_token)
     logger.info(f'write_tag {tag}')
+
+    # check that input data is not empty
     if tag is None:
             raise HTTPException(
                 status_code=404,
                 detail=str("Recived data is empty"),
             )
     try:
+        # create Token object from input data
         token = Token(value=access_token)
     except ValueError as e:
+        # if some troubles with validation, create 404 error (but it will be 
+        # better to use code 400, like "bad request")
         raise HTTPException(
             status_code=404,
             detail=str(e),
         )
-    response = await writetag(tag, token)
-    if response.status_code != 200:
+    ws_results = await write_tag(tag, token)
+    # check if smth happend during connection or sending
+    if ws_results.status_code != 200:
         raise HTTPException(
-            status_code=response.status_code,
-            detail=response.response,
+            status_code=ws_results.status_code,
+            detail=ws_results.response,
         )
+    # if everuthing is OK return nothing as in a task
     return None

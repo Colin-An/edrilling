@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# endpoint for checking server
 @router.get("/getServiceInfo/", status_code=200)
 async def get_service_info() -> JSONResponse:
     """

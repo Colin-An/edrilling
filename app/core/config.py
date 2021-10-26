@@ -1,6 +1,6 @@
 from pydantic import BaseSettings
 
-
+# default settings if there are nothing in environment
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PUBLIC_VERSION: str = "0.001"
