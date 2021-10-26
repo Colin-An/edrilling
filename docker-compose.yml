@@ -2,7 +2,9 @@ version: '3.9'
 
 services:
     app:
-        image: colin174/template_app:latest
+        build:
+            context: .
+        image: colin174/endpoint_app:latest
         container_name: endpoints
         restart: unless-stopped
         env_file:
